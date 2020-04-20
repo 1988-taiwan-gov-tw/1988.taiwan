@@ -1113,7 +1113,7 @@ INSERT INTO `wp_usermeta` (`umeta_id`, `user_id`, `meta_key`, `meta_value`) VALU
 (17, 1, 'wp_dashboard_quick_press_last_post_id', '4'),
 (18, 1, 'community-events-location', 'a:1:{s:2:\"ip\";s:13:\"144.136.218.0\";}'),
 (19, 1, 'source_domain', 'localhost/1988dev'),
-(20, 1, 'primary_blog', '1'),;
+(20, 1, 'primary_blog', '1');
 
 -- --------------------------------------------------------
 
