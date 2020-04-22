@@ -1,6 +1,6 @@
 # 1988顧台灣
 
-## 開發者資訊 -----
+## 開發者資訊
 - 專案採 Wordpress 開源碼開發，使用版本為 5.4  
 
 ## 你能如何貢獻：
@@ -10,7 +10,7 @@
 - 提供優化功能建議
 - 協助翻譯
 
-## 簡易安裝指南 -----
+## 簡易安裝指南
 Wordpress 
 - 下載：https://tw.wordpress.org/download/
 - 安裝指南：https://wordpress.org/support/article/how-to-install-wordpress/
