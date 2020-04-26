@@ -4,11 +4,11 @@
 # 都會遭到系統覆寫。
 <IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteBase /1988dev/
+RewriteBase /
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /1988dev/index.php [L]
+RewriteRule . /index.php [L]
 </IfModule>
 
 # END WordPress
