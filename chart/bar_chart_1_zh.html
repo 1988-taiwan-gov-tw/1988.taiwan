@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>d3.js learning</title>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC&display=swap" rel="stylesheet">
+    <style type="text/css">
+        body {
+            font-family: "Noto Sans TC", "SansSerif", "sans-serif";
+        }
+
+        svg {
+            font-size: 0.8em;
+            shape-rendering: crispEdges;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+        }
+
+        path.domain {
+            stroke: none;
+        }
+
+        .y .tick line {
+            stroke: #000;
+        }
+    </style>
+
+</head>
+<body>
+    <div id="covid_view"></div>
+<script type="text/javascript">
+
+
+    function rendering() {
+        document.body.innerHTML = "";
+        var parse = d3.time.format("%Y/%m/%d").parse;
+        var margin = {top: 40, right: 20, bottom: 80, left: 60};
+
+        var width = window.innerWidth - margin.left - margin.right - window.innerWidth / 10,
+            height = window.innerHeight - margin.top - margin.bottom - window.innerHeight / 10;
+
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        /* Data in strings like it would be if imported from a csv */
+        d3.json("https://covid19dashboard.cdc.gov.tw/dash4", function (data) {
+
+            // Transpose the data into layers
+            var dataset = d3.layout.stack()(["法定傳染病通報", "居家檢疫送驗", "擴大監測送驗"].map(function (category) {
+                return Object.keys(data).map(function (d) {
+                    return {x: parse(data[d]['通報日']), y: data[d][category], category: category};
+                });
+            }));
+
+            // Set x, y and colors
+            var x = d3.time.scale()
+                .domain([dataset[0][0].x, dataset[0][dataset[0].length - 1].x]).rangeRound([0, width]);
+
+
+            var y = d3.scale.linear()
+                .domain([0, d3.max(dataset, function (d) {
+                    return d3.max(d, function (d) {
+
+                        return d.y0 + d.y * 1.2;
+                    });
+                })])
+                .range([height, 0]);
+
+            var colors = ["#5b9ad5", "#f1c232", "#6aa84f"];
+
+
+            // Define and draw axes
+            var yAxis = d3.svg.axis()
+                .scale(y)
+                .orient("left")
+                .ticks(5)
+                .tickFormat(function (d) {
+                    return d
+                });
+
+            var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom")
+                .tickFormat(function (d) {
+
+                    return d.getMonth() + 1 + '/' + d.getDate();
+                });
+
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")
+                .attr("y", 0)
+                .attr("x", -30)
+                .attr("dy", ".35em")
+                .attr("transform", "rotate(270)")
+                .style("text-anchor", "start");
+
+
+            svg.append("text")
+                .attr("transform",
+                    "translate(" + (width / 2) + " ," +
+                    (height + margin.top + 20) + ")")
+                .style("text-anchor", "middle")
+                .text("通報日");
+
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("確診數");
+
+            // Create groups for each series, rects for each segment
+            var groups = svg.selectAll("g.number")
+                .data(dataset)
+                .enter().append("g")
+                .attr("class", "number")
+                .style("fill", function (d, i) {
+
+                    return colors[i];
+                });
+
+            var rect = groups.selectAll("rect")
+                .data(function (d) {
+                    return d;
+                })
+                .enter()
+                .append("rect")
+                .attr("x", function (d) {
+                    return x(d.x);
+                })
+                .attr("y", function (d) {
+                    return y(d.y0 + d.y);
+                })
+                .attr("height", function (d) {
+                    return y(d.y0) - y(d.y0 + d.y);
+                })
+                .attr("width", Math.floor(width / dataset[0].length) - 1)
+
+                .on("mouseover", function () {
+                    tooltip.style("display", null);
+                })
+                .on("mouseout", function () {
+                    tooltip.style("display", "none");
+                })
+                .on("click", function () {
+                    tooltip.style("display", null);
+                })
+                .on("mousemove", function (d) {
+
+                    tooltip.select("text").text(d.x.getMonth() + 1 + '/' + d.x.getDate() + '  Cases : ' + d.y).style("fill", function (e) {
+                        if (d.category === "擴大監測送驗") {
+                            return colors[2]
+                        } else if (d.category === "居家檢疫送驗") {
+                            return colors[1]
+                        } else if (d.category === "法定傳染病通報") {
+                            return colors[0]
+                        }
+                    })
+                });
+
+
+            // Draw legend
+            var legend = svg.selectAll(".legend")
+                .data(colors)
+                .enter().append("g")
+                .attr("class", "legend")
+                .attr("transform", function (d, i) {
+                    return "translate(18," + i * window.innerHeight / 20 + ")";
+                });
+
+            legend.append("rect")
+                .attr("x", 0)
+                .attr("y", window.innerHeight / 20)
+                .attr("width", window.innerHeight / 50)
+                .attr("height", window.innerHeight / 50)
+                .style("fill", function (d, i) {
+                    return colors.slice().reverse()[i];
+                });
+
+            legend.append("text")
+                .attr("x", window.innerWidth / 50)
+                .attr("y", window.innerHeight / 20)
+                .attr("dy", window.innerHeight / 60)
+                .attr("font-size", window.innerWidth / 50)
+                .style("text-anchor", "start")
+                .text(function (d, i) {
+                    switch (i) {
+                        case 0:
+                            return "擴大監測送驗";
+                        case 1:
+                            return "居家檢疫送驗";
+                        case 2:
+                            return "法定傳染病通報";
+                    }
+                });
+
+
+            // Prep the tooltip bits, initial display is hidden
+            var tooltip = svg.append("g")
+                .attr("class", "tooltip")
+                .style("display", "none");
+
+
+            tooltip.append("text")
+                .attr("x", window.innerWidth / 10)
+                .attr("dy", window.innerHeight / 4)
+                .style("text-anchor", "middle")
+                .attr("font-size", window.innerWidth / 50);
+
+            svg.append("text")
+                .attr("x", (width / 2))
+                .attr("y", 16 - (margin.top / 2))
+                .attr("text-anchor", "middle")
+                .style("font-size", window.innerWidth / 40)
+                .text("COVID-19(武漢肺炎) 監測趨勢圖-依通報來源");
+        });
+
+    }
+
+    d3.select(window).on('resize', rendering);
+    rendering();
+
+
+</script>
+</body>
+</html>

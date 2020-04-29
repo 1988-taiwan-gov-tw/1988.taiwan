@@ -8,6 +8,13 @@
  * @since 1.0.0
  */
 
+add_filter('avf_logo_link','av_change_logo_link');
+function av_change_logo_link($link)
+{
+$link = "#";
+return $link;
+}
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -157,3 +164,4 @@ if ( version_compare( PHP_VERSION, '5.3', '>=' ) ) {
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-filters.php';
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-hooks.php';
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-functions.php';
+
