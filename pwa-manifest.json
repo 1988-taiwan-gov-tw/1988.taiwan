@@ -1,0 +1,23 @@
+{
+    "name": "1988 \u9867\u53f0\u7063",
+    "short_name": "1988",
+    "description": "\u884c\u653f\u9662\u9632\u75ab\u7d13\u56f0\u632f\u8208\u5c08\u5340",
+    "icons": [
+        {
+            "src": "\/wp-content\/uploads\/2020\/05\/1988.png",
+            "sizes": "192x192",
+            "type": "image\/png"
+        },
+        {
+            "src": "\/wp-content\/uploads\/2020\/05\/1988-2.png",
+            "sizes": "512x512",
+            "type": "image\/png"
+        }
+    ],
+    "background_color": "#d5e0eb",
+    "theme_color": "#D5E0EB",
+    "display": "standalone",
+    "orientation": "portrait",
+    "start_url": "https:\/\/git.1988.designworks.tw\/",
+    "scope": "https:\/\/git.1988.designworks.tw\/"
+}
